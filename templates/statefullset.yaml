@@ -1,4 +1,4 @@
-{{range $i, $e := until .Values.replicaCount | int }}
+{{range $i, $e := until (int64 .Values.replicaCount)}}
 apiVersion: v1
 kind: PersistentVolume
 metadata:
