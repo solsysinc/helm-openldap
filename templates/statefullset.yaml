@@ -27,7 +27,13 @@ metadata:
   namespace: {{ .Release.Namespace }}
   name: data-{{ template "openldap.fullname" . }}-{{$i}}
   labels:
-    app: registry
+    app: {{ template "openldap.fullname" . }}
+    chart: {{ template "openldap.chart" . }}
+    release: {{ .Release.Name }}
+    heritage: {{ .Release.Service }}
+{{- if .Values.extraLabels }}
+{{ toYaml .Values.extraLabels | indent 4 }}
+{{- end }}
 spec:
   accessModes:
   {{- range .Values.persistence.accessModes }}
