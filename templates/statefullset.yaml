@@ -1,3 +1,45 @@
+{{range $i, $e := until .Values.replicaCount}}
+apiVersion: v1
+kind: PersistentVolume
+metadata:
+  name: {{ template "openldap.fullname" . }}-vol-{{$i}}
+spec:
+  capacity:
+    storage: {{ .Values.persistence.size | quote }}
+  volumeMode: Filesystem
+  accessModes:
+  {{- range .Values.persistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  persistentVolumeReclaimPolicy: Retain
+  csi:
+    driver: driver.longhorn.io
+    fsType: ext4
+    volumeAttributes:
+      numberOfReplicas: '3'
+      staleReplicaTimeout: '30'
+    volumeHandle: {{ template "openldap.fullname" . }}-vol-{{$i}}
+  storageClassName: longhorn
+---
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  namespace: {{ .Release.Namespace }}
+  name: data-{{ template "openldap.fullname" . }}-{{$i}}
+  labels:
+    app: registry
+spec:
+  accessModes:
+  {{- range .Values.persistence.accessModes }}
+    - {{ . | quote }}
+  {{- end }}
+  resources:
+    requests:
+      storage: {{ .Values.persistence.size | quote }}
+  storageClassName: longhorn
+  volumeName: {{ template "openldap.fullname" . }}-vol-{{$i}}
+---
+{{end}}
 apiVersion: {{ template "statefulset.apiVersion" . }}
 kind: StatefulSet
 metadata:
