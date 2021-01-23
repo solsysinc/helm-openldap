@@ -5,10 +5,10 @@ metadata:
   name: openldap-vol-{{$i}}
 spec:
   capacity:
-    storage: {{ .Values.persistence.size | quote }}
+    storage: {{ $.Values.persistence.size | quote }}
   volumeMode: Filesystem
   accessModes:
-  {{- range .Values.persistence.accessModes }}
+  {{- range $.Values.persistence.accessModes }}
     - {{ . | quote }}
   {{- end }}
   persistentVolumeReclaimPolicy: Retain
@@ -24,23 +24,23 @@ spec:
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  namespace: {{ .Release.Namespace }}
+  namespace: {{ $.Release.Namespace }}
   name: data-openldap-{{$i}}
   labels:
     app: openldap
-    release: {{ .Release.Name }}
-    heritage: {{ .Release.Service }}
-{{- if .Values.extraLabels }}
-{{ toYaml .Values.extraLabels | indent 4 }}
+    release: {{ $.Release.Name }}
+    heritage: {{ $.Release.Service }}
+{{- if $.Values.extraLabels }}
+{{ toYaml $.Values.extraLabels | indent 4 }}
 {{- end }}
 spec:
   accessModes:
-  {{- range .Values.persistence.accessModes }}
+  {{- range $.Values.persistence.accessModes }}
     - {{ . | quote }}
   {{- end }}
   resources:
     requests:
-      storage: {{ .Values.persistence.size | quote }}
+      storage: {{ $.Values.persistence.size | quote }}
   storageClassName: longhorn
   volumeName: openldap-vol-{{$i}}
 ---
